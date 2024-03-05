@@ -16,6 +16,7 @@
                     <th>Keterangan</th>
                 </tr>
                 <?php
+                // require("koneksi.php");
                 $i = 1;
                     $query = mysqli_query($koneksi, "SELECT*FROM buku LEFT JOIN kategori on buku.kategori_id = kategori.kategori_id");
                     while ($data = mysqli_fetch_array($query)) {

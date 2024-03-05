@@ -1,52 +1,58 @@
-<h1 class="mt-4">Tentang Buku</h1>
 <?php
-$id=$_GET['id'];
-// Definisikan variabel $data
-$query=mysqli_query($koneksi,"SELECT * FROM buku WHERE buku_id='$id'");
-$buku=mysqli_fetch_array($query);
-$data = [
-    'buku' => [
-        'judul' => $buku['judul'],
-        'penulis' => $buku['penulis'],
-        'penerbit' => $buku['penerbit'],
-        'tahun_terbit' => $buku['tahun_terbit']
-    ],
-    'ulasan' => [
-        ['Ulasan' => 'Ulasan 1', 'Rating' => 'Rating 1', 'NamaLengkap' => 'Nama Lengkap 1'],
-        ['Ulasan' => 'Ulasan 2', 'Rating' => 'Rating 2', 'NamaLengkap' => 'Nama Lengkap 2'],
-        ['Ulasan' => 'Ulasan 3', 'Rating' => 'Rating 3', 'NamaLengkap' => 'Nama Lengkap 3']
-    ]
-];
+// include 'koneksi.php';
+$id = $_GET['id'];
+$query = mysqli_query($koneksi, "SELECT * FROM buku WHERE buku_id='$id'");
+$buku = mysqli_fetch_array($query);
+
+// Ambil data ulasan dari database
+$queryUlasan = mysqli_query($koneksi, "SELECT ulasan.*, user.username
+FROM ulasan
+JOIN user ON ulasan.user_id = user.user_id WHERE buku_id='$id'");
+$ulasan = [];
+while ($row = mysqli_fetch_assoc($queryUlasan)) {
+    $ulasan[] = $row;
+}
 ?>
 
-<div class="container-fluid" >
+<h1 class="mt-4">Tentang Buku</h1>
+
+<div class="container-fluid">
     <div class="row">
         <div class="col-md-3">
-
             <!-- Profile Image -->
             <div class="card card-primary card-outline">
-                <div class="card-body box-profile" >
-                    <h3 class="profile-username text-center"><?= $data['buku']['judul']; ?></h3>
+                <div class="card-body box-profile">
+                    <h3 class="profile-username text-center">
+                        <?= $buku['judul']; ?>
+                    </h3>
+                    <!-- Tambahkan cover buku di sini -->
+                    <img src=assets/upload/<?= base64_encode($buku['cover_buku']); ?>" alt="Cover Buku" class="img-fluid">
                     <ul class="list-group list-group-unbordered mb-3">
                         <li class="list-group-item">
                             <b>Penulis</b>
-                            <label style="color:black" class="badge badge-dark"> <?= $data['buku']['penulis']; ?></label>
+                            <label style="color:black" class="badge badge-dark">
+                                <?= $buku['penulis']; ?>
+                            </label>
                         </li>
                         <li class="list-group-item">
                             <b>Penerbit</b>
-                            <label style="color:black" class="badge badge-info float-right"><?= $data['buku']['penerbit']; ?></label>
+                            <label style="color:black" class="badge badge-info float-right">
+                                <?= $buku['penerbit']; ?>
+                            </label>
                         </li>
                         <li class="list-group-item">
                             <b>Tahun Terbit</b>
-                            <label style="color:black" class="badge badge-info float-right"><?= $data['buku']['tahun_terbit']; ?></label>
+                            <label style="color:black" class="badge badge-info float-right">
+                                <?= $buku['tahun_terbit']; ?>
+                            </label>
                         </li>
-                        
-                        <a href="berikan_ulasan.php?id=<?= $id; ?>" class="btn btn-success btn-block mt-2">
+                        <a href="ulasan_tambah.php?id=<?= $id; ?>" class="btn btn-success btn-block mt-2">
                             <b>Berikan Ulasan</b>
                         </a>
                         <a href="?page=daftarbuku" class="btn btn-danger btn-block mt-2">
                             <b>Kembali</b>
                         </a>
+                    </ul>
                 </div>
                 <!-- /.card-body -->
             </div>
@@ -55,6 +61,18 @@ $data = [
         </div>
         <!-- /.col -->
         <div class="col-md-9">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h4>Deskripsi Buku</h4>
+                </div>
+
+                <div class="card-body">
+                    <!-- Tambahkan deskripsi buku di sini -->
+                    <p>
+                        <?= $buku['deskripsi']; ?>
+                    </p>
+                </div>
+            </div>
             <div class="card card-primary card-outline">
                 <div class="card-header">
                     <h4>Ulasan</h4>
@@ -70,14 +88,20 @@ $data = [
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($data['ulasan'] as $ulasan): ?>
-                            <tr>
-                                <td><?= $ulasan['Ulasan']; ?></td>
-                                <td><?= $ulasan['Rating']; ?></td>
-                                <td><?= $ulasan['NamaLengkap']; ?></td>
-                            </tr>
+                            <?php foreach ($ulasan as $row): ?>
+                                <tr>
+                                    <td>
+                                        <?= $row['ulasan']; ?>
+                                    </td>
+                                    <td>
+                                        <?= $row['rating']; ?>
+                                    </td>
+                                    <td>
+                                        <?= $row['username']; ?>
+                                    </td>
+                                </tr>
                             <?php endforeach ?>
-                        
+                        </tbody>
                     </table>
                 </div>
             </div>
